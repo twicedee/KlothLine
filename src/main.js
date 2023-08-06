@@ -133,7 +133,7 @@ function renderProducts() {
                } else if (_product.klothtype === "4") {
                     document.getElementById("skirts").appendChild(newDiv);
 
-               } else if (_product.kloyhtype === "5") {
+               } else if (_product.klothtype === "5") {
                     document.getElementById("shorts").appendChild(newDiv);
 
                } else if (_product.klothtype === "6") {
@@ -215,14 +215,14 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
      try {
           const result = await contract.methods.addproduct(...params).send({ from: kit.defaultAccount })
           notification(`🎉 You successfully added "${params[2]}".`)
-          
+          document.getElementById("klothtype").value = "0"
           document.getElementById("imgmgUrl").value = "";
           document.getElementById("name").value = "";
           document.getElementById("size").value = "";
           document.getElementById("newprice").value = "";
           document.getElementById("addedstock").value = "";
           addProducts()
-          //populateKlothTypes()
+          populateKlothTypes()
           
      } catch (error) {
           notification(`⚠️ Failed to add product: ${error}.`);
