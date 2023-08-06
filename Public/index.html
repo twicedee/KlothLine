@@ -10,10 +10,11 @@
      <link rel="preconnect" href="https://fonts.gstatic.com" />
      <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
-     <!--link rel="stylesheet" type="text/css" href="src/styles.css" /-->
+     
 
      <title>KlothLine</title>
      <style>
+          
           :root {
                --bs-font-sans-serif: 'DM Sans', sans-serif;
           }
@@ -28,7 +29,7 @@
           .addItem{
                vertical-align: right;
           }
-          /* Styles for the modal container */
+
           .modal-container {
                display: none;
                position: fixed;
@@ -36,9 +37,9 @@
                left: 0;
                width: 100%;
                height: 100%;
-               background-color: rgba(0, 0, 0, 0.6); /* Adjust the alpha value to control the blur intensity */
-               backdrop-filter: blur(5px); /* Adjust the blur radius as needed */
-               z-index: 9999; /* Set a high z-index to ensure it appears above other content */
+               background-color: rgba(0, 0, 0, 0.6); 
+               backdrop-filter: blur(5px); 
+               z-index: 9999; 
                justify-content: center;
                align-items: center;
           }
@@ -84,6 +85,13 @@
                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);             
           }
 
+          .card img {
+               width: auto; 
+               height: 50%;
+               object-fit: cover; 
+          }
+
+
           @media screen and (max-width: 768px) {
                .card {
                     width: 250px;
@@ -99,6 +107,7 @@
 </head>
 
 <body>
+
      <!--Navbar-->
      <div class="container" style="max-width: 100%">
           <nav class="navbar bg-body-tertiary">
@@ -122,9 +131,6 @@
                </div>
                
           </nav>
-          <!--div class="alert alert-warning sticky-top mt-2" role="alert">
-               <span id="notification">⌛ Loading...</span>
-          </div-->
           <div class="modal-container">
                <div class="alert alert-warning" role="alert">
                     <span id="notification">⌛ Loading...</span>
@@ -152,14 +158,11 @@
                <h2>shirts</h2>
                <div class="row">
                     <div id="shirts" class="scrolling-wrapper">
-
-                         
+   
                     </div>
                </div>
-
-
-
           </div>
+          <!--Skirts-->
           <div class="container">
                <div class="row">
                     <h2>Skirts</h2>
@@ -168,15 +171,16 @@
                     </div>
                </div>
           </div>
+          <!--Dresses-->
           <div class="container">
                <div class="row">
                     <h2>Dresses</h2>
                     <div id="dresses" class="scrolling-wrapper">
 
                     </div>
-
                </div>
           </div>
+          <!--Shorts-->
           <div class="container">
                <div class="row">
                     <h2>Shorts</h2>
@@ -185,15 +189,16 @@
                     </div>
                </div>
           </div>
+          <!--Headwear-->
           <div class="container">
                <div class="row">
                     <h2>Headwear</h2>
                     <div id="headwear" class="scrolling-wrapper">
 
                     </div>
-
                </div>
           </div>
+          <!--Shoes-->
           <div class="container">
                <div class="row">
                     <h2>Shoes</h2>
@@ -204,7 +209,7 @@
           </div>
      </main>
 
-
+     <!--Modal of Adding Items-->
      <div class="modal fade" id="additem" aria-hidden="true" aria-labelledby="newProduct">
           <div class="modal-dialog">
                <div class="modal-content">

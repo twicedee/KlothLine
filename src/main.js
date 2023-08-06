@@ -2,13 +2,13 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
 import klothlineAbi from '../Contract/klothline.abi.json'
-//app.use(express.static('images'));
+
+
+
 
 
 const ERC20_DECIMALS = 18
 const klothlineAddress = "0xa46460c34254971a42B3Ba3400CCA66b6dE0Cf2f"
-
-
 let kit
 let contract
 let products = []
@@ -83,7 +83,7 @@ const addProducts = async function () {
 
 
 
-
+     //Calling cKlothTypes and putting them in a DropDown
 function typedropdown(types) {
      let dropdownOptions = "";
      for (let i = 0; i < types.length; i++) {
@@ -92,7 +92,6 @@ function typedropdown(types) {
      return dropdownOptions;
 }
 
-   
 async function Kloth_Types() {
      const types = await contract.methods.getKlothTypes().call();
      const dropdownHtml = typedropdown(types);
@@ -100,9 +99,7 @@ async function Kloth_Types() {
 }
    
  
-//Create the input 
-
-
+          //Rendering Items to their specific Containers
 function renderProducts() {
      const typeselected = document.getElementById("klothtype").value;
      document.getElementById("pants").innerHTML = ""
@@ -153,7 +150,7 @@ function renderProducts() {
 
 
 
-
+     ///Added Product Template
 
 function productTemplate(_product) {
      return `
@@ -163,7 +160,10 @@ function productTemplate(_product) {
                <p class="card-text">Size: ${_product.size}</p>
                <p class="card-text">In Stock: ${_product.stock}</p>
                <p class="card-text">Price: ${_product.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} CELO</p> 
-               <p class="card-text">Qty: <input type="number" class="form-control mb-2" placeholder="0" value=${_product.quantity}/></p>
+               <div class="input-container>
+                    <label for="quantity>Qty: </label>
+                    <input type="number" name="quantity" class="form-control mb-2" placeholder="1" value=${_product.quantity}/>
+               </div>
                <a class="btn btn-primary purchasebtn btn-rounded-pill" id=${_product.index}>Purchase</a>
                
           </div>
@@ -200,7 +200,7 @@ window.addEventListener("load", async () => {
 
 
 
-
+     // Adding new Product
 document.querySelector("#newProductBtn").addEventListener("click", async (e) => {
      const params = [
           document.getElementById("klothtype").value,
@@ -230,25 +230,21 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
      }
 
      notificationOff()
-     
-     
-        
+           
 });
 
 
-
+          /////////Buying function/////////
 document.querySelector("#shopitems").addEventListener("click", async (e) => {
      if (e.target.className.includes("purchasebtn")) {
           const index = e.target.id;
           notification("⌛ Waiting for payment approval...");
 
           try {
-               // Call the purchaseproduct function on the smart contract
                const result = await contract.methods
                     .purchaseproduct(index)
                     .send({ from: kit.defaultAccount});
 
-               // Log the transaction details for testing
                console.log(result);
 
                notification(`🎉 You successfully bought "${products[index].name}".`);
