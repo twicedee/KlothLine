@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang='en'>
+
+<head>
+     <!-- Meta tags -->
+     <meta charset="utf-8">
+     <meta name='viewport' content='width=device-width, initial-scale=1'>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous" />
+     <link rel="preconnect" href="https://fonts.gstatic.com" />
+     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
+     
+
+     <title>KlothLine</title>
+     <style>
+          
+          :root {
+               --bs-font-sans-serif: 'DM Sans', sans-serif;
+          }
+
+          body {
+               background-color: darkgrey;
+               margin: 0;
+               padding: 0;
+               overflow-x: hidden;
+          }
+
+          .addItem{
+               vertical-align: right;
+          }
+
+          .modal-container {
+               display: none;
+               position: fixed;
+               top: 0;
+               left: 0;
+               width: 100%;
+               height: 100%;
+               background-color: rgba(0, 0, 0, 0.6); 
+               backdrop-filter: blur(5px); 
+               z-index: 9999; 
+               justify-content: center;
+               align-items: center;
+          }
+
+          /* Styles for the alert box */
+          .alert {
+               display: block;
+               background-color: white;
+               padding: 10px;
+               border-radius: 5px;
+               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+          }
+
+
+          
+
+
+          .scrolling-wrapper {
+               display: flex;
+               max-width: 100%;
+               padding-bottom: 30px;
+               gap: 10px;
+               white-space: nowrap;
+               overflow-x: scroll;
+               overflow-y: hidden;
+               white-space: nowrap;
+               -webkit-overflow-scrolling: touch;
+               display: flex;
+               justify-content: flex-start;
+               
+
+               &::-webkit-scrollbar {
+                    display: none;
+               }
+          }
+
+          .card {
+               flex: 0 0 auto;
+               width: 300px;
+               background-color: #f2f2f2;
+               padding: 10px;
+               border-radius: 5px;
+               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);             
+          }
+
+          .card img {
+               width: auto; 
+               height: 50%;
+               object-fit: cover; 
+          }
+
+
+          @media screen and (max-width: 768px) {
+               .card {
+                    width: 250px;
+               }
+          }
+
+          @media screen and (max-width: 480px) {
+               .card {
+                    width: 50%;
+               }
+          }
+     </style>
+</head>
+
+<body>
+
+     <!--Navbar-->
+     <div class="container" style="max-width: 100%">
+          <nav class="navbar bg-body-tertiary">
+               <div class="container-fluid">
+                    <span class="navbar-brand">
+                         <img src="icon.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+                         KlothLine
+                    </span>
+                    <span class="nav-link border rounded-start-pill bg-info">
+                         <span id="balance">0</span>
+                         CELO
+                    </span>
+
+               </div>
+          </nav>
+          <nav class="navbar bg-body-tertiary">
+               <div class="container fluid d-flex justify-content-end">
+                    <span>
+                         <button class="btn btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#additem">Add New Item</button>
+                    </span>
+               </div>
+               
+          </nav>
+          <div class="modal-container">
+               <div class="alert alert-warning" role="alert">
+                    <span id="notification">⌛ Loading...</span>
+               </div>
+          </div>
+     </div>
+
+     <!--/Navbar-->
+
+
+     <!--Items for shop-->
+     <main id="shopitems">
+
+          <div class="container">
+               <!--pants-->
+               <div class="row">
+                    <h2>Pants</h2>
+                    <div id="pants" class="scrolling-wrapper">
+                         
+                    </div>
+               </div>
+          </div>
+          <!--shirts-->
+          <div class="container">
+               <h2>shirts</h2>
+               <div class="row">
+                    <div id="shirts" class="scrolling-wrapper">
+   
+                    </div>
+               </div>
+          </div>
+          <!--Skirts-->
+          <div class="container">
+               <div class="row">
+                    <h2>Skirts</h2>
+                    <div id="skirts" class="scrolling-wrapper">
+
+                    </div>
+               </div>
+          </div>
+          <!--Dresses-->
+          <div class="container">
+               <div class="row">
+                    <h2>Dresses</h2>
+                    <div id="dresses" class="scrolling-wrapper">
+
+                    </div>
+               </div>
+          </div>
+          <!--Shorts-->
+          <div class="container">
+               <div class="row">
+                    <h2>Shorts</h2>
+                    <div id="shorts" class="scrolling-wrapper">
+
+                    </div>
+               </div>
+          </div>
+          <!--Headwear-->
+          <div class="container">
+               <div class="row">
+                    <h2>Headwear</h2>
+                    <div id="headwear" class="scrolling-wrapper">
+
+                    </div>
+               </div>
+          </div>
+          <!--Shoes-->
+          <div class="container">
+               <div class="row">
+                    <h2>Shoes</h2>
+                    <div id="shoes" class="scrolling-wrapper">
+
+                    </div>
+               </div>
+          </div>
+     </main>
+
+     <!--Modal of Adding Items-->
+     <div class="modal fade" id="additem" aria-hidden="true" aria-labelledby="newProduct">
+          <div class="modal-dialog">
+               <div class="modal-content">
+                    <div class="modal-header">
+                         <h5 class="modal-title text-center" id="newProduct">Add An Item</h5>
+                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                         <form id="additemform">
+                              <div class="form-row">
+                                   <div class="input-group mb-3">
+                                        <select class="form-select" id="klothtype">
+                                        </select>
+                                             
+                                   </div>
+                                   <div class="col">
+                                        <input type="text" id="imgmgUrl" class="form-control mb-2"
+                                             placeholder="Enter image url" />
+                                   </div>
+                                   
+                                   <div class="col">
+                                        <input type="text" id="name" class="form-control mb-2"
+                                             placeholder="Enter name"/>
+                                   </div>
+
+                                   <div class="col">
+                                        <input type="text" id="size" class="form-control mb-2"
+                                             placeholder="Enter Size" />
+                                   </div>
+
+                                   <div class="col">
+                                        <input type="number" id="addedstock" class="form-control mb-2"
+                                             placeholder="0" />
+                                   </div>
+                                   <div class="col">
+                                        <input type="number" id="newprice" class="form-control mb-2"
+                                             placeholder="Enter Price" />
+                                   </div>
+                                   
+                                   
+                              </div>
+                         </form>
+                    </div>
+                    <div class="modal-footer">
+                         <button type="button" class="btn btn-light border" data-bs-dismiss="modal">Close</button>
+                         <button type="button" class="btn btn-dark" data-bs-dismiss="modal" id="newProductBtn"> Add
+                              product</button>
+                    </div>
+               </div>
+          </div>
+     </div>
+
+
+     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
+          integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
+          crossorigin="anonymous"></script>
+     <script src="https://unpkg.com/ethereum-blockies@0.1.1/blockies.min.js"></script>
+<script type="text/javascript" src="main.js"></script></body>
+
+</html>
