@@ -202,36 +202,65 @@ window.addEventListener("load", async () => {
 
      // Adding new Product
 document.querySelector("#newProductBtn").addEventListener("click", async (e) => {
-     const params = [
-          document.getElementById("klothtype").value,
-          document.getElementById("imgmgUrl").value,
-          document.getElementById("name").value,
-          document.getElementById("size").value,
-          new BigNumber(document.getElementById("newprice").value).shiftedBy(ERC20_DECIMALS).toString(),
-          document.getElementById("addedstock").value
-     ] 
-     
-     notification(`⌛ Adding "${params[2]}"...`)
-     try {
-          const result = await contract.methods.addproduct(...params).send({ from: kit.defaultAccount })
-          notification(`🎉 You successfully added "${params[2]}".`)
-          document.getElementById("klothtype").value = "0"
-          document.getElementById("imgmgUrl").value = "";
-          document.getElementById("name").value = "";
-          document.getElementById("size").value = "";
-          document.getElementById("newprice").value = "";
-          document.getElementById("addedstock").value = "";
-          addProducts()
-          populateKlothTypes()
-          
-     } catch (error) {
-          notification(`⚠️ Failed to add product: ${error}.`);
-          
-     }
+    const klothtype = document.getElementById("klothtype").value;
+    const imageUrl = document.getElementById("imgmgUrl").value.trim();
+    const name = document.getElementById("name").value.trim();
+    const size = document.getElementById("size").value.trim();
+    const price = new BigNumber(document.getElementById("newprice").value).shiftedBy(ERC20_DECIMALS);
+    const stock = parseInt(document.getElementById("addedstock").value);
 
-     notificationOff()
-           
+    if (klothtype === "0") {
+        notification("⚠️ Please select a valid KlothType.");
+        return;
+    }
+
+    if (!imageUrl) {
+        notification("⚠️ Image URL is required.");
+        return;
+    }
+
+    if (!name) {
+        notification("⚠️ Product name is required.");
+        return;
+    }
+
+    if (!size) {
+        notification("⚠️ Product size is required.");
+        return;
+    }
+
+    if (isNaN(price) || price.isLessThanOrEqualTo(0)) {
+        notification("⚠️ Price must be a valid positive number.");
+        return;
+    }
+
+    if (isNaN(stock) || stock <= 0) {
+        notification("⚠️ Stock must be a valid positive integer.");
+        return;
+    }
+
+    notification(`⌛ Adding "${name}"...`);
+    try {
+        const result = await contract.methods.addproduct(klothtype, imageUrl, name, size, price.toString(), stock)
+            .send({ from: kit.defaultAccount });
+
+        notification(`🎉 You successfully added "${name}".`);
+        document.getElementById("klothtype").value = "0";
+        document.getElementById("imgmgUrl").value = "";
+        document.getElementById("name").value = "";
+        document.getElementById("size").value = "";
+        document.getElementById("newprice").value = "";
+        document.getElementById("addedstock").value = "";
+        addProducts();
+        populateKlothTypes();
+
+    } catch (error) {
+        notification(`⚠️ Failed to add product: ${error}.`);
+    }
+
+    notificationOff();
 });
+
 
 
           /////////Buying function/////////
