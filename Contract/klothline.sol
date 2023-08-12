@@ -17,8 +17,22 @@ contract Klothline {
         uint stock;
         uint quantity;
     }
+
+        struct Review {
+        address reviewer;
+        string comment;
+        uint rating; // Could be a scale of 1 to 5
+    }
+
+    mapping(uint => Review[]) private productReviews;
     
     mapping (uint => Product) internal products;
+
+    event StockChanged(
+    uint indexed productId,
+    uint newStock
+);
+
 
     event ProductAdded(
         uint indexed productId,
@@ -75,26 +89,33 @@ contract Klothline {
         productsLength++;
     }
 
-    function getProduct(uint _index) public view returns(
-        KlothType,
-        string memory,
-        string memory,
-        string memory,
-        uint,
-        uint,
-        uint
-    ) {
-        require(_index < productsLength, "Invalid product index");
-        return (
-            products[_index].klothType,
-            products[_index].image,
-            products[_index].name,
-            products[_index].size,
-            products[_index].price,
-            products[_index].stock,
-            products[_index].quantity
-        );
-    }
+ function getProduct(uint _index) public view returns(
+    KlothType,
+    string memory,
+    string memory,
+    string memory,
+    uint,
+    uint,
+    uint
+) {
+    require(_index < productsLength, "Invalid product index");
+
+    Product memory product = products[_index];
+
+    // Ensure the product is in stock before returning its details
+    require(product.stock > 0, "Product is out of stock");
+
+    return (
+        product.klothType,
+        product.image,
+        product.name,
+        product.size,
+        product.price,
+        product.stock,
+        product.quantity
+    );
+}
+
 
     function getKlothTypes() public pure returns (KlothType[] memory) {
         KlothType[] memory types = new KlothType[](7);
@@ -108,31 +129,51 @@ contract Klothline {
         return types;
     }
 
-    function purchaseProduct(uint _index, uint _quantity) public payable {
-        require(_index < productsLength, "Invalid product index");
-        require(_quantity > 0, "Quantity must be greater than 0");
-        require(_quantity <= products[_index].stock, "Insufficient stock");
-        
-        uint totalPrice = products[_index].price * _quantity;
-        require(msg.value >= totalPrice, "Insufficient funds");
+ function purchaseProduct(uint _index, uint _quantity) public payable {
+    require(_index < productsLength, "Invalid product index");
+    require(_quantity > 0, "Quantity must be greater than 0");
+    require(_quantity <= products[_index].stock, "Insufficient stock");
 
-        // Transfer the payment to the shop owner's account
-        owner.transfer(totalPrice);
+    uint totalPrice = products[_index].price * _quantity;
+    require(msg.value >= totalPrice, "Insufficient funds");
 
-        // Refund excess payment
-        uint refundAmount = msg.value - totalPrice;
-        if (refundAmount > 0) {
-            payable(msg.sender).transfer(refundAmount);
-        }
+    // Update product quantity and stock first
+    products[_index].quantity += _quantity;
+    products[_index].stock -= _quantity;
 
-        // Update product quantity and stock
-        products[_index].quantity += _quantity;
-        products[_index].stock -= _quantity;
+    // Transfer the payment to the shop owner's account
+    owner.transfer(totalPrice);
 
-        emit ProductPurchased(msg.sender, _index, _quantity, totalPrice);
+    // Refund excess payment
+    uint refundAmount = msg.value - totalPrice;
+    if (refundAmount > 0) {
+     payable(msg.sender).transfer(refundAmount);
     }
+
+    emit StockChanged(_index, products[_index].stock);
+    emit ProductPurchased(msg.sender, _index, _quantity, totalPrice);
+}
+
+       
+  
 
     function getProductsLength() public view returns (uint) {
         return productsLength;
     }
+
+    function leaveReview(uint _productIndex, string memory _comment, uint _rating) public {
+    require(_productIndex < productsLength, "Invalid product index");
+    require(_rating >= 1 && _rating <= 5, "Invalid rating");
+
+    Product storage product = products[_productIndex];
+    require(product.quantity > 0, "Only buyers can leave reviews");
+
+    Review memory newReview = Review({
+        reviewer: msg.sender,
+        comment: _comment,
+        rating: _rating
+    });
+    productReviews[_productIndex].push(newReview);
+}
+
 }
