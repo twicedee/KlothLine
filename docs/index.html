@@ -4,11 +4,16 @@
 <head>
      <!-- Meta tags -->
      <meta charset="utf-8">
-     <meta name='viewport' content='width=device-width, initial-scale=1'>
-     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" rel="stylesheet"
-          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" crossorigin="anonymous" />
-     <link rel="preconnect" href="https://fonts.gstatic.com" />
-     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet" />
+     <meta name='viewport' 
+          content='width=device-width, initial-scale=1'>
+     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/css/bootstrap.min.css" 
+          rel="stylesheet"
+          integrity="sha384-BmbxuPwQa2lc/FVzBcNJ7UAyJxM6wuqIj61tLrc4wSX0szH/Ev+nYRRuWlolflfl" 
+          crossorigin="anonymous" />
+     <link rel="preconnect" 
+          href="https://fonts.gstatic.com" />
+     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700&display=swap" 
+          rel="stylesheet" />
      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.4.0/font/bootstrap-icons.css" />
      
 
@@ -53,10 +58,6 @@
                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
           }
 
-
-          
-
-
           .scrolling-wrapper {
                display: flex;
                max-width: 100%;
@@ -79,28 +80,49 @@
           .card {
                flex: 0 0 auto;
                width: 300px;
-               background-color: #f2f2f2;
                padding: 10px;
                border-radius: 5px;
-               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);             
+               box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);    
+               padding-bottom: 0;   
+               margin-bottom: 0; 
+               height: auto;
+               background: rgba(255,255,255,0.65);
+               -webkit-backdrop-filter: blur(19px);
+               backdrop-filter: blur(19px);
+               border: 1px solid rgba(255,255,255,0.325);
+               text-overflow: flex;
+               
+                    
           }
 
           .card img {
-               width: auto; 
+               max-width: 100%; 
                height: 50%;
                object-fit: cover; 
           }
 
-
-          @media screen and (max-width: 768px) {
-               .card {
-                    width: 250px;
-               }
+          #btnRate, 
+          #btnReview{
+               display: inline-block;
+               vertical-align: top;
+               border-radius: 20px;
           }
 
+          .rounded-start {
+               border-radius: 20px 0 0 20px;
+          }
+
+          .rounded-end {
+               border-radius: 0 20px 20px 0;
+          }
+          
+
+
+          
           @media screen and (max-width: 480px) {
                .card {
                     width: 50%;
+                    
                }
           }
      </style>
@@ -111,9 +133,8 @@
      <!--Navbar-->
      <div class="container" style="max-width: 100%">
           <nav class="navbar bg-body-tertiary">
-               <div class="container-fluid">
-                    <span class="navbar-brand">
-                         <img src="icon.png" alt="Logo" width="30" height="24" class="d-inline-block align-text-top">
+               <div class="container">
+                    <span class="navbar-brand text-center">
                          KlothLine
                     </span>
                     <span class="nav-link border rounded-start-pill bg-info">
@@ -124,7 +145,7 @@
                </div>
           </nav>
           <nav class="navbar bg-body-tertiary">
-               <div class="container fluid d-flex justify-content-end">
+               <div class="container d-flex justify-content-end">
                     <span>
                          <button class="btn btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#additem">Add New Item</button>
                     </span>
@@ -144,64 +165,92 @@
      <!--Items for shop-->
      <main id="shopitems">
 
+
+          <!--pants-->
           <div class="container">
-               <!--pants-->
+               <h1>Pants</h1>
+          </div>
+          <div class="container-fluid">
+               
                <div class="row">
-                    <h2>Pants</h2>
                     <div id="pants" class="scrolling-wrapper">
                          
                     </div>
                </div>
           </div>
+
+
           <!--shirts-->
           <div class="container">
-               <h2>shirts</h2>
+               <h1>Shirts</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
                     <div id="shirts" class="scrolling-wrapper">
    
                     </div>
                </div>
           </div>
+
+
           <!--Skirts-->
           <div class="container">
+               <h1>Skirts</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
-                    <h2>Skirts</h2>
                     <div id="skirts" class="scrolling-wrapper">
 
                     </div>
                </div>
           </div>
+
+
           <!--Dresses-->
           <div class="container">
+               <h1>Dresses</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
-                    <h2>Dresses</h2>
                     <div id="dresses" class="scrolling-wrapper">
 
                     </div>
                </div>
           </div>
+
+
           <!--Shorts-->
           <div class="container">
+               <h1>Shorts</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
-                    <h2>Shorts</h2>
                     <div id="shorts" class="scrolling-wrapper">
 
                     </div>
                </div>
           </div>
+
+
           <!--Headwear-->
           <div class="container">
+               <h1>Headwear</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
-                    <h2>Headwear</h2>
                     <div id="headwear" class="scrolling-wrapper">
 
                     </div>
                </div>
           </div>
+
+
           <!--Shoes-->
           <div class="container">
+               <h1>Shoes</h1>
+          </div>
+          <div class="container-fluid">
                <div class="row">
-                    <h2>Shoes</h2>
                     <div id="shoes" class="scrolling-wrapper">
 
                     </div>
@@ -209,7 +258,7 @@
           </div>
      </main>
 
-     <!--Modal of Adding Items-->
+     <!--Modal for Adding Items-->
      <div class="modal fade" id="additem" aria-hidden="true" aria-labelledby="newProduct">
           <div class="modal-dialog">
                <div class="modal-content">
@@ -242,7 +291,7 @@
 
                                    <div class="col">
                                         <input type="number" id="addedstock" class="form-control mb-2"
-                                             placeholder="0" />
+                                             placeholder="Add Stock" />
                                    </div>
                                    <div class="col">
                                         <input type="number" id="newprice" class="form-control mb-2"
@@ -261,8 +310,7 @@
                </div>
           </div>
      </div>
-
-
+     
      <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta2/dist/js/bootstrap.bundle.min.js"
           integrity="sha384-b5kHyXgcpbZJO/tY9Ul7kGkf1S0CWuKcCD38l8YkeH8z8QjE0GmW1gYU5S9FOnJ0"
           crossorigin="anonymous"></script>
