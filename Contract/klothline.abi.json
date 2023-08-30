@@ -5,10 +5,90 @@
 		"type": "constructor"
 	},
 	{
+		"anonymous": false,
 		"inputs": [
 			{
-				"internalType": "enum klothline.KlothType",
-				"name": "_klothtype",
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "productId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "enum Klothline.KlothType",
+				"name": "klothType",
+				"type": "uint8"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "image",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "name",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "string",
+				"name": "size",
+				"type": "string"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "price",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "stock",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductAdded",
+		"type": "event"
+	},
+	{
+		"anonymous": false,
+		"inputs": [
+			{
+				"indexed": true,
+				"internalType": "address",
+				"name": "buyer",
+				"type": "address"
+			},
+			{
+				"indexed": true,
+				"internalType": "uint256",
+				"name": "productId",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "quantity",
+				"type": "uint256"
+			},
+			{
+				"indexed": false,
+				"internalType": "uint256",
+				"name": "totalPrice",
+				"type": "uint256"
+			}
+		],
+		"name": "ProductPurchased",
+		"type": "event"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "enum Klothline.KlothType",
+				"name": "_klothType",
 				"type": "uint8"
 			},
 			{
@@ -37,7 +117,7 @@
 				"type": "uint256"
 			}
 		],
-		"name": "addproduct",
+		"name": "addProduct",
 		"outputs": [],
 		"stateMutability": "nonpayable",
 		"type": "function"
@@ -47,12 +127,61 @@
 		"name": "getKlothTypes",
 		"outputs": [
 			{
-				"internalType": "string[]",
+				"internalType": "enum Klothline.KlothType[]",
 				"name": "",
-				"type": "string[]"
+				"type": "uint8[]"
 			}
 		],
 		"stateMutability": "pure",
+		"type": "function"
+	},
+	{
+		"inputs": [
+			{
+				"internalType": "uint256",
+				"name": "_index",
+				"type": "uint256"
+			}
+		],
+		"name": "getProduct",
+		"outputs": [
+			{
+				"internalType": "enum Klothline.KlothType",
+				"name": "",
+				"type": "uint8"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "string",
+				"name": "",
+				"type": "string"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "",
+				"type": "uint256"
+			}
+		],
+		"stateMutability": "view",
 		"type": "function"
 	},
 	{
@@ -87,60 +216,16 @@
 				"internalType": "uint256",
 				"name": "_index",
 				"type": "uint256"
+			},
+			{
+				"internalType": "uint256",
+				"name": "_quantity",
+				"type": "uint256"
 			}
 		],
-		"name": "purchaseproduct",
+		"name": "purchaseProduct",
 		"outputs": [],
 		"stateMutability": "payable",
-		"type": "function"
-	},
-	{
-		"inputs": [
-			{
-				"internalType": "uint256",
-				"name": "_index",
-				"type": "uint256"
-			}
-		],
-		"name": "readProduct",
-		"outputs": [
-			{
-				"internalType": "enum klothline.KlothType",
-				"name": "",
-				"type": "uint8"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "string",
-				"name": "",
-				"type": "string"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			},
-			{
-				"internalType": "uint256",
-				"name": "",
-				"type": "uint256"
-			}
-		],
-		"stateMutability": "view",
 		"type": "function"
 	}
 ]

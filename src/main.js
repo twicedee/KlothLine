@@ -2,13 +2,16 @@ import Web3 from 'web3'
 import { newKitFromWeb3 } from '@celo/contractkit'
 import BigNumber from "bignumber.js"
 import klothlineAbi from '../Contract/klothline.abi.json'
-
+import erc20Abi from "../contract/erc20.abi.json"
 
 
 
 
 const ERC20_DECIMALS = 18
-const klothlineAddress = "0xa46460c34254971a42B3Ba3400CCA66b6dE0Cf2f"
+const klothlineAddress = "0xa369d914EC1Cd5D6b86F42eE1328665B298f0286"
+const CeloContractAddress = "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
+
+
 let kit
 let contract
 let products = []
@@ -45,13 +48,9 @@ const connectCeloWallet = async function () {
 //reading the balance of someones wallet
 const getBalance = async function () {
      const totalBalance = await kit.getTotalBalance(kit.defaultAccount)
-     const cUSDBalance = totalBalance.CELO.shiftedBy(-ERC20_DECIMALS).toFixed(2)
-     document.querySelector("#balance").textContent = cUSDBalance
+     const CeloBalance = totalBalance.CELO.shiftedBy(-ERC20_DECIMALS).toFixed(2)
+     document.querySelector("#balance").textContent = CeloBalance
 }
-
-
-
-
 
 
 //adding products
@@ -62,7 +61,7 @@ const addProducts = async function () {
 
      for (let i = 0; i < _productsLength; i++) {
           let _product = new Promise(async (resolve, reject) => {
-               let p = await contract.methods.readProduct(i).call()
+               let p = await contract.methods.getProduct(i).call()
                resolve({
                     index: i,
                     klothtype: p[0],
@@ -70,8 +69,8 @@ const addProducts = async function () {
                     name: p[2],
                     size: p[3],
                     price: new BigNumber(p[4]),
-                    quantity: p[5],
-                    stock: p[6]
+                    stock: p[5],
+                    quantity: p[6]
                })
           })
           _products.push(_product)
@@ -83,19 +82,35 @@ const addProducts = async function () {
 
 
 
-     //Calling cKlothTypes and putting them in a DropDown
-function typedropdown(types) {
-     let dropdownOptions = "";
-     for (let i = 0; i < types.length; i++) {
-          dropdownOptions += `<option value="${i}">${types[i]}</option>`;
-     }
-     return dropdownOptions;
+async function approve(_price) {
+     const CeloContract = new kit.web3.eth.Contract(erc20Abi, CeloContractAddress)
+
+     const result = await CeloContract.methods
+          .approve(klothlineAddress, _price)
+          .send({ from: kit.defaultAccount })
+     return result
 }
 
-async function Kloth_Types() {
+async function populateKlothTypes() {
      const types = await contract.methods.getKlothTypes().call();
      const dropdownHtml = typedropdown(types);
      document.getElementById("klothtype").innerHTML = dropdownHtml;
+}
+
+
+//Calling cKlothTypes and putting them in a DropDown
+function typedropdown(types) {
+     return`
+          <option value="0">Choose...</option>
+          <option value=${types[0]}>Pants</option>
+          <option value=${types[1]}>Shirts</option>
+          <option value=${types[2]}>Dresses</option>
+          <option value=${types[3]}>Skirts</option>
+          <option value=${types[4]}>Shorts</option>
+          <option value=${types[5]}>Shoes</option>
+          <option value=${types[6]}>Headwear</option>
+          `
+                                   
 }
    
  
@@ -155,22 +170,21 @@ function renderProducts() {
 function productTemplate(_product) {
      return `
           <img src=${_product.image} class="card-img-top">
-          <div class="card-body">
+          <div class="card-body ">
                <h5 class="card-title">${_product.name}</h5>
                <p class="card-text">Size: ${_product.size}</p>
                <p class="card-text">In Stock: ${_product.stock}</p>
                <p class="card-text">Price: ${_product.price.shiftedBy(-ERC20_DECIMALS).toFixed(2)} CELO</p> 
-               <div class="input-container>
-                    <label for="quantity>Qty: </label>
-                    <input type="number" name="quantity" class="form-control mb-2" placeholder="1" value=${_product.quantity}/>
+               <div class="input-group mb-3">
+                    <span class="input-group-text">Qty:</span>
+                    <input type="number" name="quantity" class="form-control" id="ProductQty" placeholder="0" value=${_product.quantity}/>
+                    <button class="btn btn-secondary purchasebtn" id=${_product.index}>Buy</button>
                </div>
-               <a class="btn btn-primary purchasebtn btn-rounded-pill" id=${_product.index}>Purchase</a>
-               
+ 
           </div>
 
      `
 }
-
 
 
 
@@ -187,12 +201,10 @@ function notificationOff() {
 }
 
 
-   
-
 window.addEventListener("load", async () => {
      notification("⌛ Loading...")
      await connectCeloWallet()
-     await Kloth_Types()
+     await populateKlothTypes()
      await getBalance()
      await addProducts()
      notificationOff()
@@ -202,47 +214,96 @@ window.addEventListener("load", async () => {
 
      // Adding new Product
 document.querySelector("#newProductBtn").addEventListener("click", async (e) => {
-     const params = [
-          document.getElementById("klothtype").value,
-          document.getElementById("imgmgUrl").value,
-          document.getElementById("name").value,
-          document.getElementById("size").value,
-          new BigNumber(document.getElementById("newprice").value).shiftedBy(ERC20_DECIMALS).toString(),
-          document.getElementById("addedstock").value
-     ] 
-     
-     notification(`⌛ Adding "${params[2]}"...`)
+     const klothtype = document.getElementById("klothtype").value;
+     const imageUrl = document.getElementById("imgmgUrl").value.trim();
+     const name = document.getElementById("name").value.trim();
+     const size = document.getElementById("size").value.trim();
+     const price = new BigNumber(document.getElementById("newprice").value).shiftedBy(ERC20_DECIMALS);
+     const stock = parseInt(document.getElementById("addedstock").value);
+
+
+     if (klothtype === "0") {
+          notification("⚠️ Please select a valid KlothType.");
+          return;
+     }
+
+     if (!imageUrl) {
+          notification("⚠️ Image URL is required.");
+          return;
+     }
+
+     if (!name) {
+          notification("⚠️ Product name is required.");
+          return;
+     }
+
+     if (!size) {
+          notification("⚠️ Product size is required.");
+          return;
+     }
+
+     if (isNaN(price) || price.isLessThanOrEqualTo(0)) {
+          notification("⚠️ Price must be a valid positive number.");
+          return;
+     }
+
+     if (isNaN(stock) || stock <= 0) {
+          notification("⚠️ Stock must be a valid positive integer.");
+          return;
+     }
+
+     notification(`⌛ Adding "${name}"...`);
      try {
-          const result = await contract.methods.addproduct(...params).send({ from: kit.defaultAccount })
-          notification(`🎉 You successfully added "${params[2]}".`)
-          document.getElementById("klothtype").value = "0"
+          const result = await contract.methods.addProduct(
+               klothtype, 
+               imageUrl, 
+               name, 
+               size, 
+               price.toString(), 
+               stock)
+               .send({ from: kit.defaultAccount });
+          console.log(result)
+          notification(`🎉 You successfully added "${name}".`);
+          document.getElementById("klothtype").value = "0";
           document.getElementById("imgmgUrl").value = "";
           document.getElementById("name").value = "";
           document.getElementById("size").value = "";
           document.getElementById("newprice").value = "";
           document.getElementById("addedstock").value = "";
-          addProducts()
-          populateKlothTypes()
-          
+          addProducts();
+          populateKlothTypes();
+
      } catch (error) {
           notification(`⚠️ Failed to add product: ${error}.`);
-          
      }
 
-     notificationOff()
-           
+     notificationOff();
 });
+        
+
+
 
 
           /////////Buying function/////////
 document.querySelector("#shopitems").addEventListener("click", async (e) => {
+     
      if (e.target.className.includes("purchasebtn")) {
           const index = e.target.id;
+          const quantity = document.getElementById("ProductQty").value
+          const price = products[index].price
+          const totalPrice = price * quantity
+          
           notification("⌛ Waiting for payment approval...");
+          try {
+               await approve(totalPrice)
+          } catch (error) {
+               notification(`⚠️ ${error}.`)
+          }
+          
 
           try {
                const result = await contract.methods
-                    .purchaseproduct(index)
+                    .purchaseProduct(index, quantity)
                     .send({ from: kit.defaultAccount});
 
                console.log(result);

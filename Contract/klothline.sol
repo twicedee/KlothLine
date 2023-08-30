@@ -1,24 +1,51 @@
-// SPDX-License-Identifier: MIT  
+// SPDX-License-Identifier: MIT
 
 pragma solidity >=0.7.0 <0.9.0;
 
+interface IERC20Token {
+    function transfer(address, uint256) external returns (bool);
+
+    function approve(address, uint256) external returns (bool);
+
+    function transferFrom(address, address, uint256) external returns (bool);
+
+    function totalSupply() external view returns (uint256);
+
+    function balanceOf(address) external view returns (uint256);
+
+    function allowance(address, address) external view returns (uint256);
+
+    event Transfer(address indexed from, address indexed to, uint256 value);
+    event Approval(address indexed owner, address indexed spender, uint256 value);
+}
+
 contract Klothline {
+    address internal CeloTokenAddress = 0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9;
     uint internal productsLength = 0;
     address payable public owner;
-    
-    enum KlothType { None, Pants, Shirts, Dresses, Skirts, Shorts, Shoes, Headwear }
+
+    enum KlothType {
+        None,
+        Pants,
+        Shirts,
+        Dresses,
+        Skirts,
+        Shorts,
+        Shoes,
+        Headwear
+    }
 
     struct Product {
         KlothType klothType;
         string image;
         string name;
-        string size; 
+        string size;
         uint price;
         uint stock;
         uint quantity;
     }
-    
-    mapping (uint => Product) internal products;
+
+    mapping(uint => Product) internal products;
 
     event ProductAdded(
         uint indexed productId,
@@ -41,7 +68,7 @@ contract Klothline {
         owner = payable(msg.sender);
     }
 
-    modifier onlyOwner {
+    modifier onlyOwner() {
         require(owner == msg.sender, "Only owner can perform this");
         _;
     }
@@ -54,6 +81,11 @@ contract Klothline {
         uint _price,
         uint _stock
     ) public onlyOwner {
+        require(bytes(_image).length > 0, "Image is required");
+        require(bytes(_name).length > 0, "Name is required");
+        require(bytes(_size).length > 0, "Size is required");
+        require(_price > 0, "Price must be greater than 0");
+        require(_stock > 0, "Stock must be greater than 0");
         products[productsLength] = Product(
             _klothType,
             _image,
@@ -75,15 +107,21 @@ contract Klothline {
         productsLength++;
     }
 
-    function getProduct(uint _index) public view returns(
-        KlothType,
-        string memory,
-        string memory,
-        string memory,
-        uint,
-        uint,
-        uint
-    ) {
+    function getProduct(
+        uint _index
+    )
+        public
+        view
+        returns (
+            KlothType,
+            string memory,
+            string memory,
+            string memory,
+            uint,
+            uint,
+            uint
+        )
+    {
         require(_index < productsLength, "Invalid product index");
         return (
             products[_index].klothType,
@@ -112,18 +150,22 @@ contract Klothline {
         require(_index < productsLength, "Invalid product index");
         require(_quantity > 0, "Quantity must be greater than 0");
         require(_quantity <= products[_index].stock, "Insufficient stock");
-        
+
         uint totalPrice = products[_index].price * _quantity;
         require(msg.value >= totalPrice, "Insufficient funds");
 
-        // Transfer the payment to the shop owner's account
-        owner.transfer(totalPrice);
+        require(
+            IERC20Token(CeloTokenAddress).transferFrom(msg.sender, owner, totalPrice),
+          "Transfer failed."
+        );
+
 
         // Refund excess payment
         uint refundAmount = msg.value - totalPrice;
         if (refundAmount > 0) {
-            payable(msg.sender).transfer(refundAmount);
+            IERC20Token(CeloTokenAddress).transferFrom(owner, msg.sender, refundAmount);
         }
+
 
         // Update product quantity and stock
         products[_index].quantity += _quantity;
