@@ -1,23 +1,20 @@
-import Web3 from 'web3'
-import { newKitFromWeb3 } from '@celo/contractkit'
+import Web3 from "web3"
+import { newKitFromWeb3 } from "@celo/contractkit"
 import BigNumber from "bignumber.js"
-import klothlineAbi from '../Contract/klothline.abi.json'
-import erc20Abi from "../contract/erc20.abi.json"
+import klothlineAbi from "../Contract/klothline.abi.json"
+import erc20Abi from "../Contract/erc20.abi.json"
 
 
-
-
+//Global variables
 const ERC20_DECIMALS = 18
-const klothlineAddress = "0xa369d914EC1Cd5D6b86F42eE1328665B298f0286"
+const klothlineAddress = "0x3D608026D9904576BCAA0e3EAB0ff0B4A031C213"
 const CeloContractAddress = "0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9"
+const ownerAddress = "0x35EcAdd8aD934614BB2089cDD59Cedf1Aa64Aa86"
 
 
 let kit
 let contract
 let products = []
-
-
-
 
 
 
@@ -45,7 +42,7 @@ const connectCeloWallet = async function () {
 
 
 
-//reading the balance of someones wallet
+//reading the balance of someone's wallet
 const getBalance = async function () {
      const totalBalance = await kit.getTotalBalance(kit.defaultAccount)
      const CeloBalance = totalBalance.CELO.shiftedBy(-ERC20_DECIMALS).toFixed(2)
@@ -53,7 +50,7 @@ const getBalance = async function () {
 }
 
 
-//adding products
+//Getting Product information from the contract
 const addProducts = async function () {
      const _productsLength = await contract.methods.getProductsLength().call()
      const _products = []
@@ -81,7 +78,7 @@ const addProducts = async function () {
 }
 
 
-
+//Function where It enables a user toApprove the price
 async function approve(_price) {
      const CeloContract = new kit.web3.eth.Contract(erc20Abi, CeloContractAddress)
 
@@ -91,6 +88,7 @@ async function approve(_price) {
      return result
 }
 
+//Getting the Klothtypes from the contract to the UI
 async function populateKlothTypes() {
      const types = await contract.methods.getKlothTypes().call();
      const dropdownHtml = typedropdown(types);
@@ -98,7 +96,7 @@ async function populateKlothTypes() {
 }
 
 
-//Calling cKlothTypes and putting them in a DropDown
+//A template fro the klothtype dropdown
 function typedropdown(types) {
      return`
           <option value="0">Choose...</option>
@@ -114,7 +112,7 @@ function typedropdown(types) {
 }
    
  
-          //Rendering Items to their specific Containers
+          //Rendering Items to their specific Containers according to the KlothTypes
 function renderProducts() {
      const typeselected = document.getElementById("klothtype").value;
      document.getElementById("pants").innerHTML = ""
@@ -124,8 +122,6 @@ function renderProducts() {
      document.getElementById("shorts").innerHTML = ""
      document.getElementById("shoes").innerHTML = ""
      document.getElementById("headwear").innerHTML = ""
-
-
 
      products.forEach((_product) => {
           if (_product.klothtype === typeselected || typeselected === "0") {
@@ -160,13 +156,7 @@ function renderProducts() {
 }
 
 
-
-
-
-
-
-     ///Added Product Template
-
+     ///Product Template
 function productTemplate(_product) {
      return `
           <img src=${_product.image} class="card-img-top">
@@ -187,14 +177,13 @@ function productTemplate(_product) {
 }
 
 
-
 function notification(_text) {
      const modalContainer = document.querySelector(".modal-container");
      const notificationText = document.querySelector("#notification");
      notificationText.textContent = _text;
      modalContainer.style.display = "flex"; 
 }
-   
+
 function notificationOff() {
      const modalContainer = document.querySelector(".modal-container");
      modalContainer.style.display = "none"; 
@@ -208,11 +197,12 @@ window.addEventListener("load", async () => {
      await getBalance()
      await addProducts()
      notificationOff()
+
 });
 
 
 
-     // Adding new Product
+     // Adding new Product from a modal
 document.querySelector("#newProductBtn").addEventListener("click", async (e) => {
      const klothtype = document.getElementById("klothtype").value;
      const imageUrl = document.getElementById("imgmgUrl").value.trim();
@@ -221,7 +211,7 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
      const price = new BigNumber(document.getElementById("newprice").value).shiftedBy(ERC20_DECIMALS);
      const stock = parseInt(document.getElementById("addedstock").value);
 
-
+     //It checks if the product being added has valid values
      if (klothtype === "0") {
           notification("⚠️ Please select a valid KlothType.");
           return;
@@ -251,7 +241,9 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
           notification("⚠️ Stock must be a valid positive integer.");
           return;
      }
+     notificationOff()
 
+     // It adds the product to the contract and then updates the UI with the new data
      notification(`⌛ Adding "${name}"...`);
      try {
           const result = await contract.methods.addProduct(
@@ -262,7 +254,6 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
                price.toString(), 
                stock)
                .send({ from: kit.defaultAccount });
-          console.log(result)
           notification(`🎉 You successfully added "${name}".`);
           document.getElementById("klothtype").value = "0";
           document.getElementById("imgmgUrl").value = "";
@@ -284,15 +275,15 @@ document.querySelector("#newProductBtn").addEventListener("click", async (e) => 
 
 
 
-          /////////Buying function/////////
+     //Purchase product, where it listens for the buy button
 document.querySelector("#shopitems").addEventListener("click", async (e) => {
      
      if (e.target.className.includes("purchasebtn")) {
           const index = e.target.id;
-          const quantity = document.getElementById("ProductQty").value
+          const quantity = products[index].quantity
           const price = products[index].price
-          const totalPrice = price * quantity
-          
+          const totalPrice = BigInt(price) * BigInt(quantity);
+
           notification("⌛ Waiting for payment approval...");
           try {
                await approve(totalPrice)
@@ -300,13 +291,10 @@ document.querySelector("#shopitems").addEventListener("click", async (e) => {
                notification(`⚠️ ${error}.`)
           }
           
-
           try {
                const result = await contract.methods
                     .purchaseProduct(index, quantity)
-                    .send({ from: kit.defaultAccount});
-
-               console.log(result);
+                    .send({ from: kit.defaultAccount, gas: 21000});
 
                notification(`🎉 You successfully bought "${products[index].name}".`);
                addProducts();
@@ -315,11 +303,10 @@ document.querySelector("#shopitems").addEventListener("click", async (e) => {
                notification(`⚠️ ${error}.`);
           }
           notificationOff()
+          document.getElementById("ProductQty").value = "0";
+          
      }
 });
-
-
-
 
 
 

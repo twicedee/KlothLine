@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 
 pragma solidity >=0.7.0 <0.9.0;
-
 interface IERC20Token {
     function transfer(address, uint256) external returns (bool);
 
@@ -20,10 +19,11 @@ interface IERC20Token {
 }
 
 contract Klothline {
-    address internal CeloTokenAddress = 0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9;
+    address internal CeloTokenAddress = 0xF194afDf50B03e69Bd7D057c1Aa9e10c9954E4C9; //Celo token address for the transactions
     uint internal productsLength = 0;
     address payable public owner;
 
+    //Kloth types being sold at the shop
     enum KlothType {
         None,
         Pants,
@@ -35,6 +35,7 @@ contract Klothline {
         Headwear
     }
 
+    //struct of the product being sild
     struct Product {
         KlothType klothType;
         string image;
@@ -63,23 +64,25 @@ contract Klothline {
         uint quantity,
         uint totalPrice
     );
-
+    
     constructor() payable {
         owner = payable(msg.sender);
     }
 
+    //Setting the owner to be the one to modify the contract
     modifier onlyOwner() {
         require(owner == msg.sender, "Only owner can perform this");
         _;
     }
 
+
     function addProduct(
-        KlothType _klothType,
-        string memory _image,
-        string memory _name,
-        string memory _size,
-        uint _price,
-        uint _stock
+        KlothType _klothType,  //Type of kloth being Added
+        string memory _image,  //Image of the Product
+        string memory _name,   //Name of the Product
+        string memory _size,   //Size of the Kloth, can be size in number or in S, M, L, XL, XXL
+        uint _price,           //Price of the product
+        uint _stock            //Available Stock
     ) public onlyOwner {
         require(bytes(_image).length > 0, "Image is required");
         require(bytes(_name).length > 0, "Name is required");
@@ -107,13 +110,10 @@ contract Klothline {
         productsLength++;
     }
 
-    function getProduct(
-        uint _index
-    )
-        public
-        view
+    //Get product function
+    function getProduct(uint _index) public view
         returns (
-            KlothType,
+            KlothType,     
             string memory,
             string memory,
             string memory,
@@ -134,6 +134,7 @@ contract Klothline {
         );
     }
 
+    //Indexing of KlothTypes
     function getKlothTypes() public pure returns (KlothType[] memory) {
         KlothType[] memory types = new KlothType[](7);
         types[0] = KlothType.Pants;
@@ -146,26 +147,21 @@ contract Klothline {
         return types;
     }
 
+    //Purchase Product Function
     function purchaseProduct(uint _index, uint _quantity) public payable {
-        require(_index < productsLength, "Invalid product index");
-        require(_quantity > 0, "Quantity must be greater than 0");
-        require(_quantity <= products[_index].stock, "Insufficient stock");
+        require(_index < productsLength, "Invalid product index");   //checks if the product being purchased is valid
+        require(_quantity > 0, "Quantity must be greater than 0");   //checks if Qquantity is greater than 0
+        require(_quantity <= products[_index].stock, "Insufficient stock"); //Checks if there is enough stock
 
+        //calculation of total Price and Checks if the customer can afford
         uint totalPrice = products[_index].price * _quantity;
         require(msg.value >= totalPrice, "Insufficient funds");
 
+        //Transfer tokens to Shop owner
         require(
             IERC20Token(CeloTokenAddress).transferFrom(msg.sender, owner, totalPrice),
           "Transfer failed."
         );
-
-
-        // Refund excess payment
-        uint refundAmount = msg.value - totalPrice;
-        if (refundAmount > 0) {
-            IERC20Token(CeloTokenAddress).transferFrom(owner, msg.sender, refundAmount);
-        }
-
 
         // Update product quantity and stock
         products[_index].quantity += _quantity;
@@ -174,6 +170,7 @@ contract Klothline {
         emit ProductPurchased(msg.sender, _index, _quantity, totalPrice);
     }
 
+    //Number of products in the contract
     function getProductsLength() public view returns (uint) {
         return productsLength;
     }

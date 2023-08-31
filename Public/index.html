@@ -25,7 +25,8 @@
           }
 
           body {
-               background-color: darkgrey;
+               background-image: url("https://images.unsplash.com/photo-1567401893414-76b7b1e5a7a5?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1470&q=80");
+               background-repeat: cover;
                margin: 0;
                padding: 0;
                overflow-x: hidden;
@@ -34,6 +35,8 @@
           .addItem{
                vertical-align: right;
           }
+
+     
 
           .modal-container {
                display: none;
@@ -52,7 +55,7 @@
           /* Styles for the alert box */
           .alert {
                display: block;
-               background-color: white;
+               background-color: hsl(0, 40%, 22%);
                padding: 10px;
                border-radius: 5px;
                box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
@@ -77,6 +80,19 @@
                }
           }
 
+          h1{
+               color:bisque;
+          }
+          .navbar-brand{
+               position: fixed;
+               width: 100%;
+               color: white;
+               padding-top: 50px;
+               font-size: 75px;
+               font-family: 'Times New Roman', Times, serif;
+
+          }
+
           .card {
                flex: 0 0 auto;
                width: 300px;
@@ -90,9 +106,7 @@
                -webkit-backdrop-filter: blur(19px);
                backdrop-filter: blur(19px);
                border: 1px solid rgba(255,255,255,0.325);
-               text-overflow: flex;
-               
-                    
+               text-overflow: flex;      
           }
 
           .card img {
@@ -100,25 +114,8 @@
                height: 50%;
                object-fit: cover; 
           }
-
-          #btnRate, 
-          #btnReview{
-               display: inline-block;
-               vertical-align: top;
-               border-radius: 20px;
-          }
-
-          .rounded-start {
-               border-radius: 20px 0 0 20px;
-          }
-
-          .rounded-end {
-               border-radius: 0 20px 20px 0;
-          }
           
-
-
-          
+  
           @media screen and (max-width: 480px) {
                .card {
                     width: 50%;
@@ -133,30 +130,33 @@
      <!--Navbar-->
      <div class="container" style="max-width: 100%">
           <nav class="navbar bg-body-tertiary">
-               <div class="container">
+               <div class="container-fluid">
                     <span class="navbar-brand text-center">
                          KlothLine
                     </span>
+               </div>
+          </nav>
+          <nav class="navbar bg-body-tertiary">
+               
+               <div class="container d-flex justify-content-end">
                     <span class="nav-link border rounded-start-pill bg-info">
                          <span id="balance">0</span>
                          CELO
                     </span>
-
-               </div>
-          </nav>
-          <nav class="navbar bg-body-tertiary">
-               <div class="container d-flex justify-content-end">
-                    <span>
-                         <button class="btn btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#additem">Add New Item</button>
-                    </span>
                </div>
                
+          </nav>
+          <nav class="navbar fixed-bottom bg-body-tertiary">
+               <div class="container-fluid">
+                    <button class="btn btn-dark rounded-pill" data-bs-toggle="modal" data-bs-target="#additem">Add</button>
+               </div>
           </nav>
           <div class="modal-container">
                <div class="alert alert-warning" role="alert">
                     <span id="notification">⌛ Loading...</span>
                </div>
           </div>
+          
      </div>
 
      <!--/Navbar-->
